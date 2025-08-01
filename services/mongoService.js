@@ -8,7 +8,6 @@ class MongoService {
         this.dbName = 'users'; 
         this.client = new MongoClient(this.url, {
             useNewUrlParser: true,
-            useUnifiedTopology: true,
             serverApi: {
                 version: ServerApiVersion.v1,
                 strict: true,
