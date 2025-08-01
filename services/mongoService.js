@@ -1,19 +1,35 @@
-const {MongoClient, ObjectId} = require ('mongodb');
-const { v4: uuidv4 } = require ('uuid');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const dotenv = require('dotenv');
+dotenv.config();
 
 class MongoService {
     constructor() {
-        // this.url = 'mongodb://localhost:27017';
         this.url = process.env.MONGO_URI;
-        this.dbName = 'brainsPart2'; 
-        this.client = new MongoClient(this.url, { useUnifiedTopology: true });
+        this.dbName = 'users'; 
+        this.client = new MongoClient(this.url, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverApi: {
+                version: ServerApiVersion.v1,
+                strict: true,
+                deprecationErrors: true,
+            }
+        });
         this.db = null;
     }
 
     async connect() {
         if (!this.db) {
-            await this.client.connect();
-            this.db = this.client.db(this.dbName);
+            try {
+                await this.client.connect();
+                // test the connexion
+                await this.client.db('admin').command({ ping: 1 });
+                console.log('Connected to MongoDB Atlas');
+                this.db = this.client.db(this.dbName);
+            } catch (err) {
+                console.error('Failed to connect to MongoDB:', err);
+                throw err;
+            }
         }
         return this.db;
     }
